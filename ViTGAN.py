@@ -15,9 +15,9 @@ class ViTGAN(PytorchGAN):
         """
         super(ViTGAN, self).__init__()
 
-        # Necessary definition for PytorchGAN
+        # Necessary attributes for PytorchGAN
         self.generator = Generator()
-        self.discriminator = Discriminator
+        self.discriminator = Discriminator()
         self.generator_input_shape = (1, 1)  # exemple
 
         self.generator.to(self.device)
