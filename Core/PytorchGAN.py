@@ -138,7 +138,7 @@ class PytorchGAN(nn.Module):
         else:
             raise ValueError('Unknown optimizer')
 
-        start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        start_time = datetime.datetime.now()
         start_epoch = 0
         self.verbose = verbose
         self.save_images_freq = save_images_freq
@@ -176,12 +176,11 @@ class PytorchGAN(nn.Module):
                     n, t_gen_loss, t_disc_total_loss, t_disc_real_loss, t_disc_fake_loss, v_gen_loss, v_disc_total_loss, v_disc_real_loss, v_disc_fake_loss, self.best_epoch))
 
             if self.ckpt_save_path:
-                self.state['lr'] = lr
-                self.state['epoch'] = n
-                self.state['state_dict'] = self.state_dict()
-                if not os.path.exists(self.ckpt_save_path):
-                    os.mkdir(self.ckpt_save_path)
-                torch.save(self.state, os.path.join(self.ckpt_save_path, f'ckpt_{start_time}_epoch{n}.ckpt'))
+                self.save(lr, n)
+
+        print(f'Reloading best epoch {self.best_epoch} according to criterion: {save_criterion}')
+        self.__load_saved_state()
+        print(f'Training completed in {str(datetime.datetime.now() - start_time).split(".")[0]}')
 
     def save(self, lr, n):
         self.state['lr'] = lr
