@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class PatchEncoder(nn.Module):
-    def __init__(self, img_size, n_channels, patch_size, projection_ouput_size, overlap=0, dropout_rate=0.0, **kwargs):
+    def __init__(self, img_size, n_channels, patch_size=8, projection_ouput_size=384, overlap=2, dropout_rate=0.0, **kwargs):
         """
         Encodes an image to a vector according to ViT process: patches, projection, cls token and positional embedding
         :param img_size: input images size, the image must be square sized

@@ -7,7 +7,7 @@ from Components.MLP import MLP
 
 
 class Transformer(nn.Module):
-    def __init__(self, in_features, n_head, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, **kwargs):
+    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, **kwargs):
         """
         Usual Transformer architecture using the L2-MultiheadSelfAttention module
         :param in_features: number of input features
@@ -42,7 +42,7 @@ class Transformer(nn.Module):
 
 
 class TransformerSLN(nn.Module):
-    def __init__(self, in_features, n_head, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, **kwargs):
+    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, **kwargs):
         """
         Variant Transformer architecture using the L2-MultiheadSelfAttention module and SLN instead of standard LayerNorm
         :param in_features: number of input features
