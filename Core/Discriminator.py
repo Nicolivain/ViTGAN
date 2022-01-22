@@ -5,6 +5,8 @@ from Components.PatchEncoder import PatchEncoder
 from Components.Tranformer import Transformer
 from Components.MLP import MLP
 
+from Tools.utils import count_params
+
 
 class Discriminator(nn.Module):
     def __init__(self, img_size, n_channels, output_size, n_transformer_layers=1, encoder_params=None, transformer_params=None, mlp_params=None, **kwargs):
@@ -26,9 +28,11 @@ class Discriminator(nn.Module):
         self.transformer_layers = nn.ModuleList([Transformer(**self.transformer_params) for _ in range(self.n_transformer_layers)])
 
         self.mlp_params['in_features'], self.mlp_params['out_features'] = self.transformer_layers[-1].in_features, self.output_size
-        self.mlp = MLP(**kwargs)
+        self.mlp = MLP(**self.mlp_params)
 
         self.sigmoid = torch.nn.Sigmoid()
+
+        print(f'Discriminator model with {count_params(self)} parameters ready')
 
     def forward(self, imgs):
         tokens = self.patch_encoder(imgs)
@@ -36,3 +40,10 @@ class Discriminator(nn.Module):
             tokens = transformer(tokens)
         output = self.mlp(tokens[:, 0, :])  # we compute the output only with the cls token
         return self.sigmoid(output)
+
+
+if __name__ == '__main__':
+    x = torch.randn(100, 3, 64, 64)
+    d = Discriminator(64, 3, 2, 2)
+    o = d(x)
+    print(o.shape)
