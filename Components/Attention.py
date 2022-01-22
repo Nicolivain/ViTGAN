@@ -34,7 +34,7 @@ class AttentionL2(nn.Module):
 class MultiHeadSelfAttentionL2(nn.Module):
     def __init__(self, in_features, n_head, head_dim, output_size=None):
         """
-        Multihead self attention L2 module based on L2-attention module
+        Multihead self L2-attention module based on L2-attention module
         :param in_features: number of input features
         :param n_head: number of attention heads
         :param head_dim: output size of each attention head
