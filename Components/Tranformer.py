@@ -61,5 +61,5 @@ if __name__ == '__main__':
     print(ret.shape)
 
     t = TransformerSLN(5, 4, 3)
-    ret = t(m, m)
+    ret = t(m[0, :, :], m)
     print(ret.shape)
