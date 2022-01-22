@@ -8,6 +8,17 @@ from Components.MLP import MLP
 
 class Transformer(nn.Module):
     def __init__(self, in_features, n_head, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False):
+        """
+        Usual Transformer architecture using the L2-MultiheadSelfAttention module
+        :param in_features: number of input features
+        :param n_head: number of attention head
+        :param attention_head_outdim: output size of each attention head, default is in_features // n_head
+        :param attention_dropout_rate: dropout rate applied at the output of the MSA
+        :param mlp_layers: list of hidden layer dimensions of the MLP module
+        :param mlp_activation: activation function of the MLP module
+        :param mlp_dropout: dropout applied at each MLP layer
+        :param spectral_rescaling: use spectral rescaling in attention module
+        """
         super(Transformer, self).__init__()
 
         self.in_features    = in_features
@@ -32,6 +43,17 @@ class Transformer(nn.Module):
 
 class TransformerSLN(nn.Module):
     def __init__(self, in_features, n_head, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False):
+        """
+        Variant Transformer architecture using the L2-MultiheadSelfAttention module and SLN instead of standard LayerNorm
+        :param in_features: number of input features
+        :param n_head: number of attention head
+        :param attention_head_outdim: output size of each attention head, default is in_features // n_head
+        :param attention_dropout_rate: dropout rate applied at the output of the MSA
+        :param mlp_layers: list of hidden layer dimensions of the MLP module
+        :param mlp_activation: activation function of the MLP module
+        :param mlp_dropout: dropout applied at each MLP layer
+        :param spectral_rescaling: use spectral rescaling in attention module
+        """
         super(TransformerSLN, self).__init__()
 
         self.in_features    = in_features
