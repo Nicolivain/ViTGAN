@@ -8,6 +8,7 @@ from torchvision.utils import save_image
 from Tools.progress_bar import print_progress_bar
 
 
+# TODO: improve logging for in training insights such as saving images / learn how to use tensorboard better
 class PytorchGAN(nn.Module):
     def __init__(self, criterion='bce', logger=None, opt='adam', device='cpu', ckpt_save_path=None, tag=''):
         super().__init__()
