@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class AttentionL2(nn.Module):
-    def __init__(self, in_features, out_features, scale=None, spectral_scaling=False):
+    def __init__(self, in_features, out_features, scale=None, spectral_scaling=False, **kwargs):
         """
         Single head L2-attention module
         :param in_features: number of input features
@@ -53,7 +53,7 @@ class AttentionL2(nn.Module):
 
 
 class MultiHeadSelfAttentionL2(nn.Module):
-    def __init__(self, in_features, n_head, head_dim, output_size=None, spectral_scaling=False):
+    def __init__(self, in_features, n_head, head_dim, output_size=None, spectral_scaling=False, **kwargs):
         """
         Multihead self L2-attention module based on L2-attention module
         :param in_features: number of input features

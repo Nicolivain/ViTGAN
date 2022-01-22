@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, in_features, out_features, layers=None, activation='relu', dropout_rate=0.0):
+    def __init__(self, in_features, out_features, layers=None, activation='relu', dropout_rate=0.0, **kwargs):
         """
         Usual MLP module
         :param in_features: number of input features

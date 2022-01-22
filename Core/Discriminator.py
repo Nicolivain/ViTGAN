@@ -7,7 +7,7 @@ from Components.MLP import MLP
 
 
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self, img_size, patch_size, ):
         super(Discriminator, self).__init__()
 
     def forward(self, x):

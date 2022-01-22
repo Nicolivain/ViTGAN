@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class PatchEncoder(nn.Module):
-    def __init__(self, img_size, n_channels, patch_size, projection_ouput_size, overlap=0):
+    def __init__(self, img_size, n_channels, patch_size, projection_ouput_size, overlap=0, dropout_rate=0.0, **kwargs):
         super(PatchEncoder, self).__init__()
 
         self.patch_size       = patch_size
@@ -18,6 +18,8 @@ class PatchEncoder(nn.Module):
         self.cls_token = nn.Parameter(torch.randn(1, 1, self.token_size))
         self.pos_embedding = nn.Parameter(torch.randn(self.n_token + 1, self.token_size))
 
+        self.dropout = nn.Dropout(p=dropout_rate)
+
     def forward(self, imgs):
         assert len(imgs.shape) == 4, 'Expected input image tensor to be of shape BxCxHxW'
         imgs_tokens = self._get_tokens(imgs)
@@ -25,6 +27,7 @@ class PatchEncoder(nn.Module):
 
         tokens = torch.cat((cls_token, imgs_tokens), dim=1)
         emb_tokens = tokens + self.pos_embedding
+        emb_tokens = self.dropout(emb_tokens)
         return emb_tokens
 
     def _get_tokens(self, imgs):
