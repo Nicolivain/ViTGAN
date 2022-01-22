@@ -10,6 +10,16 @@ from Tools.utils import count_params
 
 class Discriminator(nn.Module):
     def __init__(self, img_size, n_channels, output_size, n_transformer_layers=1, encoder_params=None, transformer_params=None, mlp_params=None, **kwargs):
+        """
+        Discriminator module for ViTGAN model
+        :param img_size: input images size, the image must be square sized
+        :param n_channels: number of channel in the input images
+        :param output_size: number of output features per input image
+        :param n_transformer_layers: number of stacked transformer blocks
+        :param encoder_params: kwargs for optional parameters of the PatchEncoder, mandatory args will be filled automatically
+        :param transformer_params: kwargs for optional parameters for each Transformer block, mandatory args will be filled automatically
+        :param mlp_params: kwargs for optional parameters of the output MLP module, mandatory args will be filled automatically
+        """
         super(Discriminator, self).__init__()
 
         self.img_size             = img_size
