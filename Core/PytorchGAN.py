@@ -156,9 +156,11 @@ class PytorchGAN(nn.Module):
         self.n_epochs = n_epochs
         for n in range(start_epoch, n_epochs):
             self.n = n
+            self.train()
             t_disc_real_loss, t_disc_fake_loss, t_disc_total_loss, t_gen_loss = self._train_epoch(dataloader)
             v_disc_real_loss, v_disc_fake_loss, v_disc_total_loss, v_gen_loss = 0, 0, 0, 0
             if validation_data is not None:
+                self.eval()
                 with torch.no_grad():
                     v_disc_real_loss, v_disc_fake_loss, v_disc_total_loss, v_gen_loss = self._validate(validation_data)
 
