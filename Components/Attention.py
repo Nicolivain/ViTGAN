@@ -10,9 +10,9 @@ class AttentionL2(nn.Module):
         pass
 
 
-class MultiHeadAttentionL2(nn.Module):
+class MultiHeadSelfAttentionL2(nn.Module):
     def __init__(self):
-        super(MultiHeadAttentionL2, self).__init__()
+        super(MultiHeadSelfAttentionL2, self).__init__()
 
     def forward(self, x):
         pass
