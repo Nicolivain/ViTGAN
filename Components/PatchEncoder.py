@@ -48,11 +48,11 @@ class PatchEncoder(nn.Module):
 
         # We reshape this 5d tensor according in a BxLxF shape: we flatten patch and channel, and flatten their 2d positionning too
         # view as Batch size, n_batch_x * n_batch_y, channels * patch_h * patch_w
-        print(imgs_patches.shape)
+        # print(imgs_patches.shape)
         # TODO: make sure the data is rearranged correctly when dimensions are ambiguous (see example below)
         imgs_patches = imgs_patches.contiguous()
         seq_patches = imgs_patches.view(imgs_patches.shape[0], imgs_patches.shape[2]*imgs_patches.shape[3], imgs_patches.shape[1]*imgs_patches.shape[4]*imgs_patches.shape[5])
-        print(seq_patches.shape)
+        # print(seq_patches.shape)
         return seq_patches
 
 

@@ -31,8 +31,8 @@ class ViTGAN(PytorchGAN):
         self.generator_params       = {} if generator_params is None else generator_params
         self.discriminator_params   = {} if discriminator_params is None else discriminator_params
 
-        self.generator_params['img_size'], self.generator_params['n_channels'], self.generator_params['lattent_space_size'] = self.img_size, self.n_channels, self.lattent_space_size
-        self.discriminator_params['img_size'], self.discriminator_params['n_channels'], self.discriminator_params['output_size'] = self.img_size, self.n_channels, 2
+        self.generator_params['img_size'], self.generator_params['n_channels'], self.generator_params['lattent_size'] = self.img_size, self.n_channels, self.lattent_space_size
+        self.discriminator_params['img_size'], self.discriminator_params['n_channels'], self.discriminator_params['output_size'] = self.img_size, self.n_channels, 1
 
         # Necessary attributes for PytorchGAN
         self.generator = Generator(**self.generator_params)
