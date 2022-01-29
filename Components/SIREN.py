@@ -1,9 +1,10 @@
+import numpy as np
 import torch
 import torch.nn as nn
 
 
 class SIREN(nn.Module):
-    def __init__(self, in_features, out_features, bias = True, is_first = False, omega_0 = 30):
+    def __init__(self, in_features, out_features, bias = True, is_first = False, omega_0 = 30, **kwargs):
         """
         Paper: Implicit Neural Representation with Periodic Activ ation Function (SIREN
         :param in_features: number of input features
@@ -26,7 +27,7 @@ class SIREN(nn.Module):
             if self.is_first:
                 self.linear.weight.uniform_(-1 / self.in_features, 1 / self.in_features)
             else:
-                self.linear.weight.uniform_(-torch.sqrt(6 / self.in_features) / self.omega_0, torch.sqrt(6 / self.in_features) / self.omega_0)
+                self.linear.weight.uniform_(-np.sqrt(6 / self.in_features) / self.omega_0, np.sqrt(6 / self.in_features) / self.omega_0)
 
     def forward(self, input):
         return torch.sin(self.omega_0 * self.linear(input))
