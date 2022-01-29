@@ -8,7 +8,7 @@ from Components.SIREN import SIREN
 
 
 class Generator(nn.Module):
-    def __init__(self, lattent_size, img_size, n_channels, feature_hidden_size,  n_transformer_layers=1, mapping_mlp_params=None, transformer_params=None):
+    def __init__(self, lattent_size, img_size, n_channels, feature_hidden_size=384, n_transformer_layers=1, mapping_mlp_params=None, transformer_params=None, **kwargs):
         """
         ViT Generator Class
         :param lattent_size: number of features in the lattent space
