@@ -34,10 +34,10 @@ class Transformer(nn.Module):
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, x):
-        nx  = self.ln1(x)
-        nx  = self.att_dropout(self.msa(nx))
-        res = self.ln2(nx + x)
-        out = self.mlp(res) + res
+        x1  = self.ln1(x)
+        x   = x + self.att_dropout(self.msa(x1))
+        x2  = self.ln2(x)
+        out = self.mlp(x2) + x
         return out
 
 
@@ -69,10 +69,8 @@ class TransformerSLN(nn.Module):
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, h, x):
-        nx  = self.ln1(h, x)
-        nx  = self.att_dropout(self.msa(nx))
-        res = self.ln2(h, nx + h)
-        out = self.mlp(res) + res
+        htmp = self.att_dropout(self.msa(self.ln1(h, x))) + h
+        out  = self.mlp(self.ln2(htmp, x)) + htmp
         return out
 
 

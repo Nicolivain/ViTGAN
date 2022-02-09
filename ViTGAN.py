@@ -37,7 +37,7 @@ class ViTGAN(PytorchGAN):
         # Necessary attributes for PytorchGAN
         self.generator = Generator(**self.generator_params)
         self.discriminator = Discriminator(**self.discriminator_params)
-        self.generator_input_shape = (self.lattent_space_size,)  # exemple
+        self.generator_input_shape = (self.lattent_space_size,)
 
         self.generator.to(self.device)
         self.discriminator.to(self.device)
