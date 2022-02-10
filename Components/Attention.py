@@ -75,7 +75,7 @@ class MultiHeadSelfAttentionL2(nn.Module):
         atts = []
         for attention_head in self.attention_heads:
             atts.append(attention_head(x))
-        atts = torch.cat(atts, in_features=-1)
+        atts = torch.cat(atts, dim=-1)
         out  = self.output_linear(atts)
         return out
 
