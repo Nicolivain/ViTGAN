@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class MLP(nn.Module):
-    def __init__(self, in_features, out_features, layers=None, activation='relu', dropout_rate=0.0, **kwargs):
+    def __init__(self, in_features, out_features, layers=None, activation='gelu', dropout_rate=0.0, **kwargs):
         """
         Usual MLP module
         :param in_features: number of input features
@@ -19,10 +19,11 @@ class MLP(nn.Module):
             for lp, lnext in zip([in_features] + self.layers, self.layers + [out_features])
             ])
 
-        self.act = torch.nn.ReLU() if activation == 'relu' else torch.nn.Tanh() if activation == 'tanh' else torch.nn.Sigmoid() if activation == 'sigmoid' else ValueError
+        self.act = torch.nn.ReLU() if activation == 'relu' else torch.nn.Tanh() if activation == 'tanh' else torch.nn.Sigmoid() if activation == 'sigmoid' else torch.nn.GELU() if activation == 'gelu' else ValueError
 
     def forward(self, x):
-        for layer in self.model:
+        for idx, layer in enumerate(self.model):
             x = layer(x)
-            x = self.act(x)
+            if idx != len(self.model) - 1:
+                x = self.act(x)
         return x
