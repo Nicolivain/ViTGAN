@@ -6,6 +6,8 @@ from Components.Tranformer import TransformerSLN
 from Components.SLN import SLN
 from Components.SIREN import SIREN
 
+from Tools.utils import count_params
+
 
 class Generator(nn.Module):
     def __init__(self, lattent_size, img_size, n_channels, feature_hidden_size=384, n_transformer_layers=1, mapping_mlp_params=None, transformer_params=None, **kwargs):
@@ -44,6 +46,8 @@ class Generator(nn.Module):
             SIREN(self.feature_hidden_size, 2*feature_hidden_size, is_first=True),
             SIREN(2*self.feature_hidden_size, self.n_channels*self.img_size, is_first=False)
         )
+
+        print(f'Generator model with {count_params(self)} parameters ready')
 
     def forward(self, x):
         w = self.mapping_mlp(x).view(-1, self.img_size, self.feature_hidden_size)
