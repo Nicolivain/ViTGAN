@@ -181,8 +181,6 @@ class PytorchGAN(nn.Module):
             if self.ckpt_save_path:
                 self.save(lr, n)
 
-        print(f'Reloading best epoch {self.best_epoch} according to criterion: {save_criterion}')
-        self.__load_saved_state()
         print(f'Training completed in {str(datetime.datetime.now() - start_time).split(".")[0]}')
 
     def save(self, lr, n):
