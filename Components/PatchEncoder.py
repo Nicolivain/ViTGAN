@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class PatchEncoder(nn.Module):
-    def __init__(self, img_size, n_channels, patch_size=8, projection_ouput_size=384, overlap=2, dropout_rate=0.0, **kwargs):
+    def __init__(self, img_size, n_channels, patch_size=8, projection_ouput_size=None, overlap=2, dropout_rate=0.0, **kwargs):
         """
         Encodes an image to a vector according to ViT process: patches, projection, cls token and positional embedding
         :param img_size: input images size, the image must be square sized
@@ -17,12 +17,12 @@ class PatchEncoder(nn.Module):
 
         self.patch_size       = patch_size
         self.overlap          = overlap
-        self.proj_output_size = projection_ouput_size
 
         self.token_size = n_channels * (self.patch_size + 2 * self.overlap)**2
         self.stride     = (img_size - self.patch_size - 2 * self.overlap) // self.patch_size + 1
         self.n_token    = ((img_size - (self.patch_size + 2 * self.overlap-1) - 1) // self.stride + 1)**2
 
+        self.proj_output_size = projection_ouput_size if projection_ouput_size is not None else self.token_size
         self.projection_matrix = nn.Linear(self.token_size, self.proj_output_size, bias=False)
         self.cls_token = nn.Parameter(torch.randn(1, 1, self.proj_output_size))
         self.pos_embedding = nn.Parameter(torch.randn(self.n_token + 1, self.proj_output_size))
