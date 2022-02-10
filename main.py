@@ -16,10 +16,10 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
     start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    save_path = "TP/TP9/runs/tag-" + start_time + '_MNIST'
+    save_path = "XP/tag-" + start_time + '_MNIST'
     writer = SummaryWriter(save_path)
 
-    img_size = 64
+    img_size = 32
     n_channels = 1
     lattent_space_size = 1024
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=1)
 
     model = ViTGAN(img_size=img_size,  n_channels=n_channels, lattent_space_size=lattent_space_size, device=device, logger=writer.add_scalar)
-    model.fit(dataloader, n_epochs=20, lr=1e-4)
+    model.fit(dataloader, n_epochs=200, lr=1e-4)
 
     noise = torch.randn(32, lattent_space_size, device=device)
     fake = model.generate(noise)
