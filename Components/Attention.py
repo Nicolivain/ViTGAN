@@ -27,7 +27,7 @@ class AttentionL2(nn.Module):
             sq, sk, sv = self._get_spectrum()
             self.init_spectrum = [max(sq), max(sk), max(sv)]
 
-        self.softmax = torch.nn.Softmax(in_features=-1)
+        self.softmax = torch.nn.Softmax(dim=-1)
 
     def forward(self, x):
         if self.spectral_scaling:
