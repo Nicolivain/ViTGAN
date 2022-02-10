@@ -24,15 +24,16 @@ class PatchEncoder(nn.Module):
         self.n_token    = ((img_size - (self.patch_size + 2 * self.overlap-1) - 1) // self.stride + 1)**2
 
         self.projection_matrix = nn.Linear(self.token_size, self.proj_output_size, bias=False)
-        self.cls_token = nn.Parameter(torch.randn(1, 1, self.token_size))
-        self.pos_embedding = nn.Parameter(torch.randn(self.n_token + 1, self.token_size))
+        self.cls_token = nn.Parameter(torch.randn(1, 1, self.proj_output_size))
+        self.pos_embedding = nn.Parameter(torch.randn(self.n_token + 1, self.proj_output_size))
 
         self.dropout = nn.Dropout(p=dropout_rate)
 
     def forward(self, imgs):
         assert len(imgs.shape) == 4, 'Expected input image tensor to be of shape BxCxHxW'
         imgs_tokens = self._get_tokens(imgs)
-        cls_token = self.cls_token.expand(imgs_tokens.shape[0], 1, self.token_size)
+        imgs_tokens = self.projection_matrix(imgs_tokens)
+        cls_token = self.cls_token.expand(imgs_tokens.shape[0], 1, self.proj_output_size)
 
         tokens = torch.cat((cls_token, imgs_tokens), dim=1)
         emb_tokens = tokens + self.pos_embedding

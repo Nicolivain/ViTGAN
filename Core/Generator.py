@@ -49,7 +49,7 @@ class Generator(nn.Module):
         w = self.mapping_mlp(x).view(-1, self.img_size, self.feature_hidden_size)
         h = self.emb
         for tf in self.transformer_layers:
-            h = tf(h, w)
+            w, h = tf(h, w)
         w = self.sln(h, w)
         res = self.output_net(w).view(x.shape[0], self.n_channels, self.img_size, self.img_size)
         return res

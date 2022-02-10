@@ -19,7 +19,7 @@ if __name__ == '__main__':
     save_path = "TP/TP9/runs/tag-" + start_time + '_MNIST'
     writer = SummaryWriter(save_path)
 
-    img_size = 32
+    img_size = 64
     n_channels = 1
     lattent_space_size = 1024
 

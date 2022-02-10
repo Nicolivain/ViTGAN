@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from einops import rearrange, repeat
 
 
 class AttentionL2(nn.Module):
@@ -26,7 +27,7 @@ class AttentionL2(nn.Module):
             sq, sk, sv = self._get_spectrum()
             self.init_spectrum = [max(sq), max(sk), max(sv)]
 
-        self.softmax = torch.nn.Softmax(dim=-1)
+        self.softmax = torch.nn.Softmax(in_features=-1)
 
     def forward(self, x):
         if self.spectral_scaling:
@@ -74,9 +75,66 @@ class MultiHeadSelfAttentionL2(nn.Module):
         atts = []
         for attention_head in self.attention_heads:
             atts.append(attention_head(x))
-        atts = torch.cat(atts, dim=-1)
+        atts = torch.cat(atts, in_features=-1)
         out  = self.output_linear(atts)
         return out
+
+
+class ScrappedAttention(nn.Module):
+    """
+    Implement multi head self attention layer using the "Einstein summation convention".
+
+    Parameters
+    ----------
+    in_features:
+        Token's dimension, EX: word embedding vector size
+    n_head:
+        The number of distinct representations to learn
+    head_dim:
+        The dimension of the each head
+    discriminator:
+        Used in discriminator or not.
+    """
+    def __init__(self, in_features, n_head = 4, head_dim = None, output_size=None, spectral_scaling = False):
+        super().__init__()
+        self.n_head = n_head
+        self.outsize = in_features if output_size is None else output_size
+        self.head_dim = int(in_features / n_head) if head_dim is None else head_dim
+        self.weight_dim = self.n_head * self.head_dim
+        self.to_qkv = nn.Linear(in_features, self.weight_dim * 3, bias = False)
+        self.scale_factor = in_features ** -0.5
+        self.spectral_scaling = spectral_scaling
+        self.w_out = nn.Linear(self.weight_dim, self.outsize, bias = True)
+
+        if spectral_scaling:
+            u, s, v = torch.svd(self.to_qkv.weight)
+            self.init_spect_norm = torch.max(s)
+
+    def forward(self, x):
+        assert x.dim() == 3
+
+        if self.spectral_scaling:
+            u, s, v = torch.svd(self.to_qkv.weight)
+            self.to_qkv.weight = torch.nn.Parameter(self.to_qkv.weight * self.init_spect_norm / torch.max(s))
+
+        # Generate the q, k, v vectors
+        qkv = self.to_qkv(x)
+        q, k, v = tuple(rearrange(qkv, 'b t (d k h) -> k b h t d', k = 3, h = self.n_head))
+
+        # Enforcing Lipschitzness of Transformer Discriminator
+        # Due to Lipschitz constant of standard dot product self-attention
+        # layer can be unbounded, so adopt the l2 attention replace the dot product.
+        if self.spectral_scaling:
+            attn = torch.cdist(q, k, p = 2)
+        else:
+            attn = torch.einsum("... i d, ... j d -> ... i j", q, k)
+        scale_attn = attn * self.scale_factor
+        scale_attn_score = torch.softmax(scale_attn, dim = -1)
+        result = torch.einsum("... i j, ... j d -> ... i d", scale_attn_score, v)
+
+        # re-compose
+        result = rearrange(result, "b h t d -> b t (h d)")
+        return self.w_out(result)
 
 
 if __name__ == '__main__':
