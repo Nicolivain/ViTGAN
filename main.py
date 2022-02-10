@@ -42,8 +42,11 @@ if __name__ == '__main__':
     batch_size = 128
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=1)
 
-    model = ViTGAN(img_size=img_size,  n_channels=n_channels, lattent_space_size=lattent_space_size, device=device, logger=writer.add_scalar)
-    model.fit(dataloader, n_epochs=200, lr=1e-4)
+    generator_params     = {'n_transformer_layers': 4}
+    discriminator_params = {'n_transformer_layers': 4}
+
+    model = ViTGAN(img_size=img_size, n_channels=n_channels, generator_params=generator_params, discriminator_params=discriminator_params, lattent_space_size=lattent_space_size, device=device, logger=writer.add_scalar)
+    model.fit(dataloader, n_epochs=100, gen_lr=2e-5, disc_lr=2e-5)
 
     noise = torch.randn(32, lattent_space_size, device=device)
     fake = model.generate(noise)
