@@ -4,13 +4,14 @@ from einops import rearrange, repeat
 
 
 class AttentionL2(nn.Module):
-    def __init__(self, in_features, out_features, scale=None, spectral_scaling=False, **kwargs):
+    def __init__(self, in_features, out_features, scale=None, spectral_scaling=False, lp=2, **kwargs):
         """
         Single head L2-attention module
         :param in_features: number of input features
         :param out_features: number of out features
         :param scale: rescale factor of d(K,Q), default is out_features
         :param spectral_scaling: perform spectral rescaling of q, k, v linear layers at each forward call
+        :param lp: norm used for attention, should be 1 or 2, default 2
         """
         super(AttentionL2, self).__init__()
 
@@ -18,6 +19,7 @@ class AttentionL2(nn.Module):
         self.out_features     = out_features
         self.scale            = out_features if scale is None else scale
         self.spectral_scaling = spectral_scaling
+        self.lp               = lp
 
         self.q = nn.Linear(self.in_features, self.out_features, bias=False)
         self.k = nn.Linear(self.in_features, self.out_features, bias=False)
@@ -36,7 +38,7 @@ class AttentionL2(nn.Module):
         k = self.k(x)
         v = self.v(x)
 
-        l2_dist = torch.cdist(q, k, p=2) if self.spectral_scaling else torch.cdist(q, k, p=1)  # we use L2 reg only in discriminator
+        l2_dist = torch.cdist(q, k, p=self.lp)  # we use L2 reg only in discriminator
         att = self.softmax(l2_dist / (self.scale**(1/2))) @ v
         return att
 
@@ -54,7 +56,7 @@ class AttentionL2(nn.Module):
 
 
 class MultiHeadSelfAttentionL2(nn.Module):
-    def __init__(self, in_features, n_head, head_dim, output_size=None, spectral_scaling=False, **kwargs):
+    def __init__(self, in_features, n_head, head_dim, output_size=None, spectral_scaling=False, lp=2, **kwargs):
         """
         Multihead self L2-attention module based on L2-attention module
         :param in_features: number of input features
@@ -62,13 +64,14 @@ class MultiHeadSelfAttentionL2(nn.Module):
         :param head_dim: output size of each attention head
         :param output_size: final output feature number, default is n_head * head_dim
         :param spectral_scaling: perform spectral rescaling of q, k, v for each head
+        :param lp: norm used for attention, should be 1 or 2, default 2
         """
         super(MultiHeadSelfAttentionL2, self).__init__()
 
         self.out_dim         = n_head * head_dim
         self.out_features    = self.out_dim if output_size is None else output_size
 
-        self.attention_heads = nn.ModuleList([AttentionL2(in_features, head_dim, scale=self.out_dim, spectral_scaling=spectral_scaling) for _ in range(n_head)])
+        self.attention_heads = nn.ModuleList([AttentionL2(in_features, head_dim, scale=self.out_dim, spectral_scaling=spectral_scaling, lp=lp) for _ in range(n_head)])
         self.output_linear   = nn.Linear(self.out_dim, self.out_features)
 
     def forward(self, x):
@@ -95,7 +98,7 @@ class ScrappedAttention(nn.Module):
     discriminator:
         Used in discriminator or not.
     """
-    def __init__(self, in_features, n_head = 4, head_dim = None, output_size=None, spectral_scaling = False):
+    def __init__(self, in_features, n_head = 4, head_dim = None, output_size=None, spectral_scaling = False, lp=2):
         super().__init__()
         self.n_head = n_head
         self.outsize = in_features if output_size is None else output_size

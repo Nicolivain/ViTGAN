@@ -42,7 +42,7 @@ class Transformer(nn.Module):
 
 
 class TransformerSLN(nn.Module):
-    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, **kwargs):
+    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.0, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.0, spectral_rescaling=False, lp=1, **kwargs):
         """
         Variant Transformer architecture using the L2-MultiheadSelfAttention module and SLN instead of standard LayerNorm
         :param in_features: number of input features
@@ -53,6 +53,7 @@ class TransformerSLN(nn.Module):
         :param mlp_activation: activation function of the MLP module
         :param mlp_dropout: dropout applied at each MLP layer
         :param spectral_rescaling: use spectral rescaling in attention module
+        :param lp: norm used for attention, should be 1 or 2, default 2
         """
         super(TransformerSLN, self).__init__()
 
@@ -65,7 +66,7 @@ class TransformerSLN(nn.Module):
 
         self.att_dropout = nn.Dropout(attention_dropout_rate)
 
-        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling)
+        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling, lp=1)
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, h, x):
