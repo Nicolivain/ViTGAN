@@ -65,7 +65,7 @@ class TransformerSLN(nn.Module):
 
         self.att_dropout = nn.Dropout(attention_dropout_rate)
 
-        self.msa = ScrappedAttention(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling)
+        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling)
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, h, x):

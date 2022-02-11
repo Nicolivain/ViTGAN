@@ -36,7 +36,7 @@ class AttentionL2(nn.Module):
         k = self.k(x)
         v = self.v(x)
 
-        l2_dist = torch.cdist(q, k, p=2)
+        l2_dist = torch.cdist(q, k, p=2) if self.spectral_scaling else q @ v  # we use L2 reg only in discriminator
         att = self.softmax(l2_dist / (self.scale**(1/2))) @ v
         return att
 
