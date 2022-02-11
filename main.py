@@ -16,12 +16,26 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
     start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    save_path = "XP/tag-" + start_time + '_MNIST'
+    save_path = "XP/tag-" + start_time + '_MNIST'  # TODO:  changer le tag quand on change de dataset sinon c'est la mort
     writer = SummaryWriter(save_path)
 
-    img_size = 32
-    n_channels = 1
+    img_size = 32  # 64
+    n_channels = 1  # 3
     lattent_space_size = 1024
+
+    """
+    # download celebA
+    print('Loading ds')
+    # Path for remote use on TME GPU
+    path = os.path.abspath('../../../../../tempory/celebA')  # path pour aller le chercher dans tempory depuis home
+    dataset = dset.ImageFolder(root=path,
+                               transform=transforms.Compose([
+                                   transforms.Resize(image_size),
+                                   transforms.CenterCrop(image_size),
+                                   transforms.ToTensor(),
+                                   transforms.Normalize(0.5, 0.5, 0.5),
+                               ]))
+    """
 
     path = os.path.abspath("../data")
     dataset = dset.MNIST(root=path,
