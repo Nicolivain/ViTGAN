@@ -59,7 +59,7 @@ if __name__ == '__main__':
     generator_params     = {'n_transformer_layers': 4}
     discriminator_params = {'n_transformer_layers': 4}
 
-    model = ViTGAN(img_size=img_size, n_channels=n_channels, generator_params=generator_params, discriminator_params=discriminator_params, lattent_space_size=lattent_space_size, device=device, logger=writer.add_scalar)
+    model = ViTGAN(img_size=img_size, n_channels=n_channels, generator_params=generator_params, discriminator_params=discriminator_params, lattent_space_size=lattent_space_size, device=device, logger=writer)
     model.fit(dataloader, n_epochs=100, gen_lr=2e-5, disc_lr=2e-5)
 
     noise = torch.randn(32, lattent_space_size, device=device)
