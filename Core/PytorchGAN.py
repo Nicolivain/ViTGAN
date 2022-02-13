@@ -32,7 +32,7 @@ class PytorchGAN(nn.Module):
         self.discriminator = None
 
         # useful stuff that can be needed for during fit
-        self.fid        = FID().to(self.device)
+        self.fid        = None
         self.start_time = None
         self.verbose    = None
         self.n_epochs   = None
@@ -43,8 +43,8 @@ class PytorchGAN(nn.Module):
 
     def _train_epoch(self, dataloader):
         fid_batch = torch.randint(0, len(dataloader), (20, 1))
+        self.fid = FID().to(self.device)
 
-        self.fid.reset()
         epoch_disc_real_loss  = 0
         epoch_disc_fake_loss  = 0
         epoch_disc_tot_loss   = 0
