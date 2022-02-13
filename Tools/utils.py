@@ -1,3 +1,5 @@
+import torch
+
 
 def count_params(model):
     cpt = 0
