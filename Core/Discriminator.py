@@ -34,7 +34,7 @@ class Discriminator(nn.Module):
         self.encoder_params['img_size'], self.encoder_params['n_channels'] = self.img_size, self.n_channels
         self.patch_encoder = PatchEncoder(**self.encoder_params)
 
-        self.transformer_params['in_features'], = self.patch_encoder.proj_output_size
+        self.transformer_params['in_features'] = self.patch_encoder.proj_output_size
         self.transformer_layers = nn.ModuleList([Transformer(**self.transformer_params) for _ in range(self.n_transformer_layers)])
 
         self.mlp_params['in_features'], self.mlp_params['out_features'] = self.transformer_layers[-1].in_features, self.output_size
