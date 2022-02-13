@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 
-from Components.Attention import MultiHeadSelfAttentionL2, ScrappedAttention
+from Components.Attention import MultiHeadSelfAttentionL2
 from Components.SLN import SLN
 from Components.MLP import MLP
 
 
 class Transformer(nn.Module):
-    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.2, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.2, spectral_rescaling=False, **kwargs):
+    def __init__(self, in_features, n_head=4, attention_head_outdim=None, attention_dropout_rate=0.2, mlp_layers=None, mlp_activation='relu', mlp_dropout=0.2, spectral_rescaling=False, lp=2, **kwargs):
         """
         Usual Transformer architecture using the L2-MultiheadSelfAttention module
         :param in_features: number of input features
@@ -18,6 +18,7 @@ class Transformer(nn.Module):
         :param mlp_activation: activation function of the MLP module
         :param mlp_dropout: dropout applied at each MLP layer
         :param spectral_rescaling: use spectral rescaling in attention module
+        :param lp: norm used for attention, should be 1 or 2, default 2
         """
         super(Transformer, self).__init__()
 
@@ -30,7 +31,7 @@ class Transformer(nn.Module):
 
         self.att_dropout = nn.Dropout(attention_dropout_rate)
 
-        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling)
+        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling, lp=lp)
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, x):
@@ -53,7 +54,7 @@ class TransformerSLN(nn.Module):
         :param mlp_activation: activation function of the MLP module
         :param mlp_dropout: dropout applied at each MLP layer
         :param spectral_rescaling: use spectral rescaling in attention module
-        :param lp: norm used for attention, should be 1 or 2, default 2
+        :param lp: norm used for attention, should be 1 or 2, default 1
         """
         super(TransformerSLN, self).__init__()
 
@@ -66,7 +67,7 @@ class TransformerSLN(nn.Module):
 
         self.att_dropout = nn.Dropout(attention_dropout_rate)
 
-        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling, lp=1)
+        self.msa = MultiHeadSelfAttentionL2(self.in_features, self.n_head, self.head_outdim, output_size=in_features, spectral_scaling=spectral_rescaling, lp=lp)
         self.mlp = MLP(self.in_features, self.in_features, layers=mlp_layers, activation=mlp_activation, dropout_rate=mlp_dropout)
 
     def forward(self, h, x):

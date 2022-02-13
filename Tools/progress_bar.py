@@ -1,5 +1,4 @@
 
-
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', print_end="\r"):
     """
     Fetched code from here: https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
