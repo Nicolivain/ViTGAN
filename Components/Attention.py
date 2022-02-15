@@ -98,6 +98,6 @@ if __name__ == '__main__':
     ret  = sat(inpt)
     print(ret.shape)
 
-    mat = MultiHeadSelfAttentionL2(5, 4, 3, spectral_scaling=True)
+    mat = MultiHeadSelfAttention(5, 4, 3, spectral_scaling=True)
     ret = mat(inpt)
     print(ret.shape)
