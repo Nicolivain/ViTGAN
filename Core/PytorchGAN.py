@@ -3,9 +3,11 @@ import os
 
 import torch
 import torch.nn as nn
+from torchmetrics.image.fid import FrechetInceptionDistance as FID
 
-from torchvision.utils import save_image
+from torchvision.utils import save_image, make_grid
 from Tools.progress_bar import print_progress_bar
+import matplotlib.pyplot as plt
 
 
 class PytorchGAN(nn.Module):
@@ -27,23 +29,30 @@ class PytorchGAN(nn.Module):
 
         # /!\ the overriding class must implement a discriminator and a generator extending nn.Module
         self.generator_input_shape = None
-        self.generator     = None
-        self.discriminator = None
+        self.generator             = None
+        self.discriminator         = None
 
         # useful stuff that can be needed for during fit
-        self.verbose  = None
-        self.n_epochs = None
-        self.n        = None
-        self.tag      = tag
+        self.start_time = None
+        self.verbose    = None
+        self.n_epochs   = None
+        self.n          = None
+        self.tag        = tag
 
         self.save_images_freq = None
 
     def _train_epoch(self, dataloader):
+        fid = FID().to(self.device)
+        fid_batch = torch.randint(0, len(dataloader), (20, 1))
+
         epoch_disc_real_loss  = 0
         epoch_disc_fake_loss  = 0
         epoch_disc_tot_loss   = 0
         epoch_gen_loss        = 0
+        disc_fid              = 0
+
         for idx, batch in enumerate(dataloader):
+
             batch_x, batch_y = batch
             batch_x = batch_x.to(self.device)
             batch_size = batch_x.size(0)
@@ -75,6 +84,13 @@ class PytorchGAN(nn.Module):
             gen_loss.backward()
             self.optG.step()
 
+            if idx in fid_batch:
+                with torch.no_grad():
+                    fake_images_8b = ((fake_images + 1) * 255 / 2).to(torch.uint8).to(self.device)
+                    batch_x_8b = ((batch_x + 1) * 255 / 2).to(torch.uint8).to(self.device)
+                    fid.update(fake_images_8b.expand((fake_images_8b.shape[0], 3, fake_images_8b.shape[2], fake_images_8b.shape[3])), real=False)
+                    fid.update(batch_x_8b.expand((batch_x_8b.shape[0], 3, batch_x_8b.shape[2], batch_x_8b.shape[3])), real=True)
+
             # Update running losses
             epoch_disc_real_loss += disc_real_loss.item()
             epoch_disc_fake_loss += disc_fake_loss.item()
@@ -83,7 +99,9 @@ class PytorchGAN(nn.Module):
             if self.verbose == 1:
                 print_progress_bar(idx, len(dataloader))
 
-        return epoch_disc_real_loss / len(dataloader), epoch_disc_fake_loss / len(dataloader), epoch_disc_tot_loss / len(dataloader), epoch_gen_loss / len(dataloader),
+        fid_value = fid.compute()
+
+        return epoch_disc_real_loss / len(dataloader), epoch_disc_fake_loss / len(dataloader), epoch_disc_tot_loss / len(dataloader), epoch_gen_loss / len(dataloader), fid_value / len(dataloader)
 
     def _validate(self, dataloader):
         epoch_disc_real_loss = 0
@@ -124,7 +142,7 @@ class PytorchGAN(nn.Module):
 
         return epoch_disc_real_loss / len(dataloader), epoch_disc_fake_loss / len(dataloader), epoch_disc_tot_loss / len(dataloader), epoch_gen_loss / len(dataloader),
 
-    def fit(self, dataloader, n_epochs, gen_lr, disc_lr, validation_data=None, verbose=1, save_images_freq=None, save_criterion='train_gen_loss', ckpt=None, betas=(0.0, 0.99), **kwargs):
+    def fit(self, dataloader, n_epochs, gen_lr, disc_lr, validation_data=None, verbose=1, save_images_freq=None, save_criterion='train_gen_loss', ckpt=None, save_model_freq=None, betas=(0.0, 0.99),  **kwargs):
         assert self.generator is not None, 'Model does not seem to have a generator, assign the generator to the self.generator attribute'
         assert self.discriminator is not None, 'Model does not seem to have a discriminator, assign the discriminator to the self.discriminator attribute'
         assert self.generator_input_shape is not None, 'Could not find the generator input shape, please specify this attribute before fitting the model'
@@ -139,6 +157,8 @@ class PytorchGAN(nn.Module):
             raise ValueError('Unknown optimizer')
 
         start_time = datetime.datetime.now()
+        self.start_time = start_time
+
         start_epoch = 0
         self.verbose = verbose
         self.save_images_freq = save_images_freq
@@ -148,15 +168,15 @@ class PytorchGAN(nn.Module):
             start_epoch = state['epoch']
             self.load_state_dict(state['state_dict'])
             for g in self.optD.param_groups:
-                g['lr'] = state['lr']
+                g['lr'] = state['lr']['disc_lr']
             for g in self.optG.param_groups:
-                g['lr'] = state['lr']
+                g['lr'] = state['lr']['gen_lr']
 
         self.n_epochs = n_epochs
         for n in range(start_epoch, n_epochs):
             self.n = n
             self.train()
-            t_disc_real_loss, t_disc_fake_loss, t_disc_total_loss, t_gen_loss = self._train_epoch(dataloader)
+            t_disc_real_loss, t_disc_fake_loss, t_disc_total_loss, t_gen_loss, disc_fid = self._train_epoch(dataloader)
             v_disc_real_loss, v_disc_fake_loss, v_disc_total_loss, v_gen_loss = 0, 0, 0, 0
             if validation_data is not None:
                 self.eval()
@@ -164,20 +184,29 @@ class PytorchGAN(nn.Module):
                     v_disc_real_loss, v_disc_fake_loss, v_disc_total_loss, v_gen_loss = self._validate(validation_data)
 
             epoch_result = {'train_disc_real_loss': t_disc_real_loss, 'train_disc_fake_loss': t_disc_real_loss, 'train_disc_total_loss': t_disc_total_loss, 'train_gen_loss': t_gen_loss,
-                            'val_disc_real_loss': v_disc_real_loss, 'val_disc_fake_loss': v_disc_real_loss, 'val_disc_total_loss': v_disc_total_loss, 'val_gen_loss': v_gen_loss}
+                            'val_disc_real_loss': v_disc_real_loss, 'val_disc_fake_loss': v_disc_real_loss, 'val_disc_total_loss': v_disc_total_loss, 'val_gen_loss': v_gen_loss,
+                            'disc_FID': disc_fid}
             if self.log:
                 for k, v in epoch_result.items():
-                    self.log(k, v, n)
+                    self.log.add_scalar(k, v, n)
 
             if epoch_result[save_criterion] <= self.best_criterion[save_criterion]:
                 self.best_criterion = epoch_result
                 self.__save_state(n)
 
             if n % verbose == 0:
-                print('Epoch {:3d} Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | Validation Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | Best epoch {:3d}'.format(
-                    n, t_gen_loss, t_disc_total_loss, t_disc_real_loss, t_disc_fake_loss, v_gen_loss, v_disc_total_loss, v_disc_real_loss, v_disc_fake_loss, self.best_epoch))
+                print('Epoch {:3d} Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | Validation Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | FID value {:1.4f} | Best epoch {:3d}'.format(
+                    n, t_gen_loss, t_disc_total_loss, t_disc_real_loss, t_disc_fake_loss, v_gen_loss, v_disc_total_loss, v_disc_real_loss, v_disc_fake_loss, disc_fid, self.best_epoch))
 
-            if self.ckpt_save_path:
+            if n % save_images_freq == 0:
+                noise = torch.randn(32, self.lattent_space_size, device=self.device)
+                fake = self.generate(noise)
+                grid = make_grid(fake)
+                self.log.add_image('images', grid, n)
+                plt.savefig(os.path.join(self.log.log_dir, f"fake{n}.png"))
+
+            if n % save_model_freq == 0 :
+                assert self.ckpt_save_path is not None, 'Need a path to save models'
                 self.save({'gen_lr': gen_lr, 'disc_lr': disc_lr}, n)
 
         print(f'Training completed in {str(datetime.datetime.now() - start_time).split(".")[0]}')

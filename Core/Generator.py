@@ -10,7 +10,7 @@ from Tools.utils import count_params
 
 
 class Generator(nn.Module):
-    def __init__(self, lattent_size, img_size, n_channels, feature_hidden_size=384, n_transformer_layers=1, mapping_mlp_params=None, transformer_params=None, **kwargs):
+    def __init__(self, lattent_size, img_size, n_channels, feature_hidden_size=384, n_transformer_layers=1, output_hidden_dim=768, mapping_mlp_params=None, transformer_params=None, **kwargs):
         """
         ViT Generator Class
         :param lattent_size: number of features in the lattent space
@@ -26,8 +26,9 @@ class Generator(nn.Module):
         self.lattent_size          = lattent_size
         self.img_size              = img_size
         self.feature_hidden_size   = feature_hidden_size
-        self.n_channels             = n_channels
+        self.n_channels            = n_channels
         self.n_transformer_layers  = n_transformer_layers
+        self.output_hidden_dim     = output_hidden_dim
 
         self.mapping_params        = {} if mapping_mlp_params is None else mapping_mlp_params
         self.transformer_params    = {} if transformer_params is None else transformer_params
@@ -43,8 +44,8 @@ class Generator(nn.Module):
         self.sln = SLN(self.feature_hidden_size)
 
         self.output_net = nn.Sequential(
-            SIREN(self.feature_hidden_size, 2*feature_hidden_size, is_first=True),
-            SIREN(2*self.feature_hidden_size, self.n_channels*self.img_size, is_first=False)
+            SIREN(self.feature_hidden_size, output_hidden_dim, is_first=True),
+            SIREN(output_hidden_dim, self.n_channels*self.img_size, is_first=False)
         )
 
         print(f'Generator model with {count_params(self)} parameters ready')
