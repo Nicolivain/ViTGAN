@@ -161,7 +161,6 @@ class PytorchGAN(nn.Module):
 
         start_epoch = 0
         self.verbose = verbose
-        self.save_images_freq = save_images_freq
 
         if ckpt:
             state = torch.load(ckpt)
@@ -198,14 +197,14 @@ class PytorchGAN(nn.Module):
                 print('Epoch {:3d} Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | Validation Gen loss: {:1.4f} Disc loss: {:1.4f} Disc real loss {:1.4f} Disc fake loss {:1.4f} | FID value {:1.4f} | Best epoch {:3d}'.format(
                     n, t_gen_loss, t_disc_total_loss, t_disc_real_loss, t_disc_fake_loss, v_gen_loss, v_disc_total_loss, v_disc_real_loss, v_disc_fake_loss, disc_fid, self.best_epoch))
 
-            if n % save_images_freq == 0:
+            if save_images_freq is not None and n % save_images_freq == 0:
                 noise = torch.randn(32, self.lattent_space_size, device=self.device)
                 fake = self.generate(noise)
                 grid = make_grid(fake)
                 self.log.add_image('images', grid, n)
                 plt.savefig(os.path.join(self.log.log_dir, f"fake{n}.png"))
 
-            if n % save_model_freq == 0 :
+            if save_images_freq is not None and n % save_model_freq == 0 :
                 assert self.ckpt_save_path is not None, 'Need a path to save models'
                 self.save({'gen_lr': gen_lr, 'disc_lr': disc_lr}, n)
 
