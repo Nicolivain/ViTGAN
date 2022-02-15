@@ -20,50 +20,39 @@ if __name__ == '__main__':
     save_path = "XP/tag-" + start_time + '_MNIST'  
     writer = SummaryWriter(save_path)
 
-    img_size = 32  # 64
-    n_channels = 1  # 3
-    lattent_space_size = 1024
+    with open('config.json', 'rb') as f:
+        config = json.load(f)
 
-    """
-    # download celebA
-    print('Loading ds')
-    # Path for remote use on TME GPU
-    path = os.path.abspath('../../../../../tempory/celebA')  # path pour aller le chercher dans tempory depuis home
-    dataset = dset.ImageFolder(root=path,
-                               transform=transforms.Compose([
-                                   transforms.Resize(image_size),
-                                   transforms.CenterCrop(image_size),
-                                   transforms.ToTensor(),
-                                   transforms.Normalize(0.5, 0.5, 0.5),
-                               ]))
-    """
+    config['img_size']          = 32
+    config['n_channels']        = 1
+
+    with open(os.path.join(save_path, 'config.json'), 'w') as f:
+        json.dump(config, f)
+
+    config['logger']            = writer
+    config['ckpt_save_path']    = None
 
     path = os.path.abspath("../data")
     dataset = dset.MNIST(root=path,
                          download=True,
                          transform=transforms.Compose([
-                             transforms.Resize(img_size),
-                             transforms.CenterCrop(img_size),
+                             transforms.Resize(config['img_size']),
+                             transforms.CenterCrop(config['img_size']),
                              transforms.ToTensor(),
                              transforms.Normalize(0.5, 0.5),
                          ]))
 
     print(dataset)
-    seed = 0
-    torch.manual_seed(seed)
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print('Device: ', device)
+    torch.manual_seed(config['seed'])
+    config['device'] = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print('Device: ', config['device'])
 
-    batch_size = 128
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=1)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], shuffle=True, num_workers=1)
 
-    generator_params     = {'n_transformer_layers': 4}
-    discriminator_params = {'n_transformer_layers': 4}
-
-    model = ViTGAN(img_size=img_size, n_channels=n_channels, generator_params=generator_params, discriminator_params=discriminator_params, lattent_space_size=lattent_space_size, device=device, logger=writer.add_scalar)
+    model = ViTGAN(**config)
     model.fit(dataloader, n_epochs=100, gen_lr=2e-5, disc_lr=2e-5)
 
-    noise = torch.randn(32, lattent_space_size, device=device)
+    noise = torch.randn(32, config['lattent_space_size'], device=config['device'])
     fake = model.generate(noise)
     img = vutils.make_grid(fake, padding=2, normalize=True)
     plt.figure(figsize=(15, 15))

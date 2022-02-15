@@ -1,4 +1,7 @@
 {
+    "batch_size": 128,
+    "lattent_space_size": 1024,
+    "seed": 0,
   "generator_params": {
       "feature_hidden_size": 384,
       "n_transformer_layers": 4,
@@ -28,7 +31,7 @@
           "attention_dropout_rate": 0.2,
           "mlp_layers": [],
           "mlp_activation": "relu",
-          "mlp_dropout": 0.2,
+          "mlp_dropout": 0.2
       },
       "mapping_mlp_params": {
           "layers": [],
