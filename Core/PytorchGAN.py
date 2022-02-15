@@ -5,9 +5,8 @@ import torch
 import torch.nn as nn
 from torchmetrics.image.fid import FrechetInceptionDistance as FID
 
-from torchvision.utils import save_image, make_grid
+from torchvision.utils import make_grid
 from Tools.progress_bar import print_progress_bar
-import matplotlib.pyplot as plt
 
 
 class PytorchGAN(nn.Module):
@@ -202,7 +201,6 @@ class PytorchGAN(nn.Module):
                 fake = self.generate(noise)
                 grid = make_grid(fake)
                 self.log.add_image('images', grid, n)
-                plt.savefig(os.path.join(self.log.log_dir, f"fake{n}.png"))
 
             if save_images_freq is not None and n % save_model_freq == 0 :
                 assert self.ckpt_save_path is not None, 'Need a path to save models'
