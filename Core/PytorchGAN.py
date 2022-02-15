@@ -142,7 +142,7 @@ class PytorchGAN(nn.Module):
 
         return epoch_disc_real_loss / len(dataloader), epoch_disc_fake_loss / len(dataloader), epoch_disc_tot_loss / len(dataloader), epoch_gen_loss / len(dataloader),
 
-    def fit(self, dataloader, n_epochs, gen_lr, disc_lr, validation_data=None, verbose=1, save_images_freq=None, save_criterion='train_gen_loss', ckpt=None, save_model_freq=None, betas=(0.0, 0.99),  **kwargs):
+    def fit(self, dataloader, n_epochs, gen_lr, disc_lr, validation_data=None, verbose=1, save_images_freq=None, save_criterion='disc_FID', ckpt=None, save_model_freq=None, betas=(0.0, 0.99),  **kwargs):
         assert self.generator is not None, 'Model does not seem to have a generator, assign the generator to the self.generator attribute'
         assert self.discriminator is not None, 'Model does not seem to have a discriminator, assign the discriminator to the self.discriminator attribute'
         assert self.generator_input_shape is not None, 'Could not find the generator input shape, please specify this attribute before fitting the model'
