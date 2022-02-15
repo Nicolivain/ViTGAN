@@ -13,9 +13,7 @@
           "attention_dropout_rate": 0.2,
           "mlp_layers": [],
           "mlp_activation": "relu",
-          "mlp_dropout": 0.2,
-          "spectral_rescaling": 0,
-          "lp": 1
+          "mlp_dropout": 0.2
       }
   },
   "discriminator_params": {
@@ -31,8 +29,6 @@
           "mlp_layers": [],
           "mlp_activation": "relu",
           "mlp_dropout": 0.2,
-          "spectral_rescaling": 1,
-          "lp": 2
       },
       "mapping_mlp_params": {
           "layers": [],

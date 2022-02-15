@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from einops import rearrange, repeat
 
 
 class AttentionL2(nn.Module):
@@ -50,9 +49,9 @@ class AttentionL2(nn.Module):
 
     def _weight_spectral_rescale(self):
         sq, sk, sv = self._get_spectrum()
-        self.q.weight = nn.Parameter(max(sq) / self.init_spectrum[0] * self.q.weight)
-        self.k.weight = nn.Parameter(max(sk) / self.init_spectrum[1] * self.k.weight)
-        self.v.weight = nn.Parameter(max(sv) / self.init_spectrum[2] * self.v.weight)
+        self.q.weight = nn.Parameter(self.init_spectrum[0] / max(sq) * self.q.weight)
+        self.k.weight = nn.Parameter(self.init_spectrum[1] / max(sk) * self.k.weight)
+        self.v.weight = nn.Parameter(self.init_spectrum[2] / max(sv) * self.v.weight)
 
 
 class MultiHeadSelfAttentionL2(nn.Module):

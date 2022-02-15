@@ -38,7 +38,7 @@ class Generator(nn.Module):
 
         self.emb = torch.nn.Parameter(torch.randn(self.img_size, self.feature_hidden_size))
 
-        self.transformer_params['in_features'] = self.feature_hidden_size
+        self.transformer_params['in_features'], self.transformer_params['spectral_scaling'], self.transformer_params['lp'] = self.feature_hidden_size, False, 1
         self.transformer_layers = nn.ModuleList([TransformerSLN(**self.transformer_params) for _ in range(self.n_transformer_layers)])
 
         self.sln = SLN(self.feature_hidden_size)
