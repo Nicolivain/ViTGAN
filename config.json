@@ -6,7 +6,7 @@
       "mapping_mlp_params": {
           "layers": [],
           "activation": "gelu",
-          "dropout_rate": 0
+          "dropout_rate": 0.0
       },
       "transformer_params": {
           "n_head": 4,
@@ -23,7 +23,7 @@
       "encoder_params": {
           "patch_size": 8,
           "overlap": 2,
-          "dropout_rate": 0
+          "dropout_rate": 0.0
       },
       "transformer_params": {
           "n_head": 4,
@@ -37,7 +37,7 @@
       "mapping_mlp_params": {
           "layers": [],
           "activation": "gelu",
-          "dropout_rate": 0
+          "dropout_rate": 0.0
       }
   }
 }
