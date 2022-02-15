@@ -1,6 +1,3 @@
-import torch
-import torch.nn
-
 from Core.Discriminator import Discriminator
 from Core.Generator import Generator
 from Core.PytorchGAN import PytorchGAN
