@@ -22,7 +22,7 @@ class PytorchGAN(nn.Module):
         self.criterion = nn.MSELoss(reduction='mean') if criterion == 'mse' else nn.BCELoss(reduction='mean') if criterion == 'bce' else criterion
 
         self.best_criterion = {'train_disc_real_loss': 10**10, 'train_disc_fake_loss': 10**10, 'train_disc_total_loss': 10**10, 'train_gen_loss': 10**10,
-                               'val_disc_real_loss': 10**10, 'val_disc_fake_loss': 10**10, 'val_disc_total_loss': 10**10, 'val_gen_loss': 10**10}
+                               'val_disc_real_loss': 10**10, 'val_disc_fake_loss': 10**10, 'val_disc_total_loss': 10**10, 'val_gen_loss': 10**10, 'disc_FID': 10**10}
         self.best_model = None
         self.best_epoch = None
 
