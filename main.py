@@ -50,7 +50,7 @@ if __name__ == '__main__':
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=config['batch_size'], shuffle=True, num_workers=1)
 
     model = ViTGAN(**config)
-    model.fit(dataloader, n_epochs=100, gen_lr=2e-5, disc_lr=2e-5)
+    model.fit(dataloader, n_epochs=100, gen_lr=2e-5, disc_lr=2e-5, save_images_freq=1)
 
     noise = torch.randn(32, config['lattent_space_size'], device=config['device'])
     fake = model.generate(noise)
