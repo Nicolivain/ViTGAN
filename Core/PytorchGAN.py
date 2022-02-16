@@ -202,7 +202,7 @@ class PytorchGAN(nn.Module):
                 grid = make_grid(fake)
                 self.log.add_image('images', grid, n)
 
-            if save_images_freq is not None and n % save_model_freq == 0 :
+            if save_model_freq is not None and n % save_model_freq == 0 :
                 assert self.ckpt_save_path is not None, 'Need a path to save models'
                 self.save({'gen_lr': gen_lr, 'disc_lr': disc_lr}, n)
 
