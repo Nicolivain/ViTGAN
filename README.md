@@ -3,7 +3,7 @@
 A Pytorch Implementation of ViTGAN based on https://arxiv.org/abs/2107.04589v1
 
 ## Contributors
-Paul Liautaud, Lise Le Boudec, Nicolas Olivain
+Lise Le Boudec, Paul Liautaud, Nicolas Olivain
 
 ## Reference
 ViTGAN: Training GANs with Vision Transformers  
