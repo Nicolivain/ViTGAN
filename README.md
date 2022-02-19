@@ -1,7 +1,7 @@
 # ViTGAN
 
 A modular Pytorch Implementation of ViTGAN based on https://arxiv.org/abs/2107.04589v1  
-The goal of this implimentation is to provide a comprehensive framework to experiment with the ViTGAN architechture.
+The goal of this projet is to provide a comprehensive framework to experiment with the ViTGAN architechture.
 ![Architechture from the paper](arch.png)
 
 ## Getting Started
