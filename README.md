@@ -10,7 +10,7 @@ You can find the main hyper parameters of the model in the *config.json*.
 The *Core* folder contains the key consitutuants of the GAN model, while the *Components* folder contains more basic building blocks, but still implemented in a general way.
 
 ## Contributors
-Lise Le Boudec, Paul Liautaud, Nicolas Olivain
+[Lise Le Boudec](https://github.com/2ailesB), [Paul Liautaud](https://github.com/PLiautaud), [Nicolas Olivain](https://github.com/Nicolivain)
 
 ## Key References
 <a id="1" href="https://arxiv.org/abs/2107.04589">[1]</a> ViTGAN: Training GANs with Vision Transformers, Kwonjoon Lee, Huiwen Chang, Lu Jiang, Han Zhang, Zhuowen Tu, Ce Liu. Jul-2021  
